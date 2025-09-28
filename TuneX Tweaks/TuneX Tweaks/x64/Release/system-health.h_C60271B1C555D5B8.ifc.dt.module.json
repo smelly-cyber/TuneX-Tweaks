@@ -1,0 +1,22 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "x64\\Release\\system-health.obj",
+            "outputs": [
+                "x64\\Release\\system-health.h_C60271B1C555D5B8.ifc.dt.module.json",
+                "x64\\Release\\system-health.h_C60271B1C555D5B8.ifc.dt.d.json",
+                "x64\\Release\\system-health.h.ifc"
+            ],
+            "provides": [
+                {
+                    "logical-name": "C:\\Users\\darcy\\OneDrive\\Desktop\\TuneX Tweaks\\TuneX Tweaks\\TuneX Tweaks\\src\\system-health.h",
+                    "source-path": "c:\\users\\darcy\\onedrive\\desktop\\tunex tweaks\\tunex tweaks\\tunex tweaks\\src\\system-health.h",
+                    "lookup-method": "absolute"
+                }
+            ],
+            "requires": []
+        }
+    ]
+}

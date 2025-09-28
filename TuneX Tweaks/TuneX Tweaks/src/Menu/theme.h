@@ -1,6 +1,9 @@
 #pragma once
 #include "imgui.h"
 
+extern ImFont* g_FontRegular;
+extern ImFont* g_FontBold;
+
 // Accent palette for TuneX
 namespace TuneX
 {
@@ -116,7 +119,6 @@ inline void DynamicHeader(const char* text)
     ImVec2 sz = ImGui::CalcTextSize(text);
 
     const float padX = 12.0f, padY = 6.0f, r = 5.0f;
-
     ImVec2 a(p.x, p.y);
     ImVec2 b(p.x + sz.x + padX * 2.0f, p.y + sz.y + padY * 2.0f);
 
@@ -124,10 +126,13 @@ inline void DynamicHeader(const char* text)
     dl->AddRect(a, b, ImGui::GetColorU32(TuneX::AccentBlue), r);
 
     ImGui::SetCursorScreenPos(ImVec2(p.x + padX, p.y + padY));
+    if (g_FontBold) ImGui::PushFont(g_FontBold);
     ImGui::TextColored(TuneX::AccentBlue, "%s", text);
+    if (g_FontBold) ImGui::PopFont();
 
     ImGui::SetCursorScreenPos(ImVec2(a.x, b.y + 6.0f));
 }
+
 
 // Button that sizes dynamically with text and gets much lighter when hovered
 inline bool DynamicButton(const char* label, ImVec4 col_border, ImVec4 col_text)

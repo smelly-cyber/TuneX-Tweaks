@@ -13,9 +13,9 @@
 // -------- DRIVE USAGE --------
 struct DriveInfo {
     std::string letter;
-    float usedRatio;
-    double freeGB;
-    double totalGB;
+    float usedRatio = 0.0f;
+    double freeGB = 0.0;
+    double totalGB = 0.0;
 };
 
 inline std::vector<DriveInfo> GetDrivesUsage()

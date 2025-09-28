@@ -8,9 +8,9 @@
 #include "backends/imgui_impl_dx9.h"
 #include <d3d9.h>
 #include <tchar.h>
-#include <shellapi.h> // for ShellExecute if you later want external links
+#include <shellapi.h>
 
-// ---------------- D3D Globals ----------------
+// D3D Globals
 static LPDIRECT3D9           g_pD3D = nullptr;
 static LPDIRECT3DDEVICE9     g_pd3dDevice = nullptr;
 static D3DPRESENT_PARAMETERS g_d3dpp = {};
@@ -18,14 +18,17 @@ static bool                  g_DeviceLost = false;
 static UINT                  g_ResizeWidth = 0, g_ResizeHeight = 0;
 static HWND                  g_hwnd = nullptr;
 
-// ---------------- Forward Declares ----------------
+// Global fonts
+ImFont* g_FontRegular = nullptr;
+ImFont* g_FontBold = nullptr;
+
+// Forward Declares
 bool CreateDeviceD3D(HWND hWnd);
 void CleanupDeviceD3D();
 void ResetDevice();
 LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-
-// ---------------- Entry ----------------
+// Entry
 int main(int, char**)
 {
     const int kWindowW = 900;
@@ -36,15 +39,14 @@ int main(int, char**)
                        L"TuneX_Class", nullptr };
     ::RegisterClassExW(&wc);
 
-    float main_scale = 1.0f;
     g_hwnd = ::CreateWindowExW(
         WS_EX_APPWINDOW,
         wc.lpszClassName,
         L"TuneX Tweaks",
         WS_POPUP | WS_SYSMENU,
         100, 100,
-        int(kWindowW * main_scale),
-        int(kWindowH * main_scale),
+        kWindowW,
+        kWindowH,
         nullptr, nullptr, wc.hInstance, nullptr);
 
     if (!CreateDeviceD3D(g_hwnd))
@@ -57,25 +59,28 @@ int main(int, char**)
     ::ShowWindow(g_hwnd, SW_SHOWDEFAULT);
     ::UpdateWindow(g_hwnd);
 
-    // ---------------- ImGui Setup ----------------
+    // ImGui Setup
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 
     // Fonts
-    io.Fonts->AddFontDefault(); // base font
+    io.Fonts->Clear();
     ImFontConfig cfg;
-    cfg.SizePixels = 18.0f;
-    io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\segoeuib.ttf", 18.0f, &cfg); // Segoe UI Bold
-    io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\segoeui.ttf", 16.0f);        // Regular body text
+    cfg.OversampleH = 4;
+    cfg.OversampleV = 4;
+    cfg.PixelSnapH = false;
+
+    g_FontRegular = io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\arial.ttf", 14.0f, &cfg);
+    g_FontBold = io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\arialbd.ttf", 14.0f, &cfg);
 
     ImGui_ImplWin32_Init(g_hwnd);
     ImGui_ImplDX9_Init(g_pd3dDevice);
     LoadTuneXIcons(g_pd3dDevice);
     LoadLogoTexture(g_pd3dDevice);
 
-    // ---------------- Main Loop ----------------
+    // Main Loop
     bool done = false;
     while (!done)
     {
@@ -110,10 +115,14 @@ int main(int, char**)
 
         ApplyTuneXTheme();
 
-        if (!IsLoggedIn())
+        if (!IsLoggedIn()) {
             DrawLoginUI(g_pd3dDevice, g_hwnd);
-        else
+        }
+        else {
             DrawTuneXApp(g_hwnd);
+        }
+
+        DrawOverlay();
 
         ImGui::EndFrame();
         g_pd3dDevice->SetRenderState(D3DRS_ZENABLE, FALSE);
@@ -144,7 +153,7 @@ int main(int, char**)
     return 0;
 }
 
-// ---------------- D3D Helpers ----------------
+// D3D Helpers
 bool CreateDeviceD3D(HWND hWnd)
 {
     if ((g_pD3D = Direct3DCreate9(D3D_SDK_VERSION)) == nullptr) return false;
@@ -173,10 +182,8 @@ void ResetDevice()
     ImGui_ImplDX9_CreateDeviceObjects();
 }
 
-// ---------------- WndProc ----------------
+// WndProc
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND, UINT, WPARAM, LPARAM);
-
-// chrome.h provides these:
 extern RECT g_CloseBtnRect;
 extern RECT g_MinBtnRect;
 extern float g_TitleBarHeight;
